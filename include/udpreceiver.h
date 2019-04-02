@@ -69,6 +69,15 @@ class UDPReceiver : public QObject
 
 public:
     UDPReceiver(QWidget *parent = 0);
+    void set_server_info(QString _server,uint16_t _port)
+    {
+        server = _server;
+        port = _port;
+    }
+    void set_debug_mode(bool v)
+    {
+        debug_mode = v;
+    }
     qint64 get_lastcomm()
     {
         if(any_comm_recived == false)
@@ -88,11 +97,13 @@ signals:
     void new_diagnosticmessage(const Diagnostic&);
     void new_devicemessage(const Device&);
     void new_resourcemessage(const Resource&);
-    void new_armedstatusmessage(const int&);
+    void new_armedstatusmessage(const ArmedState&);
     void new_image(const QPixmap&);
 private:
-
+    bool debug_mode;
     QUdpSocket *udpSocket;
+    QString server;
+    uint16_t port;
     QHostAddress groupAddress;
     UDPMessageHandler *udpmessagehandler;
     QElapsedTimer lastcomm_timer;

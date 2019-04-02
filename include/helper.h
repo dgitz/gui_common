@@ -43,6 +43,11 @@ struct Diagnostic
     int Message;
     std::string Description;
 };
+struct ArmedState
+{
+    int state;
+};
+
 struct Port
 {
     std::string name;

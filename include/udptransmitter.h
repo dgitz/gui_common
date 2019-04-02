@@ -74,6 +74,15 @@ public:
     {
         debug_mode = v;
     }
+    void Start()
+    {
+        qDebug() << "Starting UDP Transmitter with: " << server << ":" << port;
+        start = true;
+        RemoteControl_AB10_timer.start();
+        ArmControl_AB26_timer.start();
+        Command_AB02_timer.start();
+        Heartbeat_AB31_timer.start();
+    }
 
     bool send_RemoteControl_0xAB10(quint64 timestamp,int axis1,int axis2,int axis3,int axis4,int axis5,int axis6,int axis7,int axis8,
                                    int button1,int button2,int button3,int button4, int button5,int button6,int button7,int button8);
@@ -84,6 +93,7 @@ public:
 
 signals:
 private:
+    bool start;
     bool debug_mode;
     QUdpSocket *xmit_socket;
     QTimer timer;

@@ -58,25 +58,23 @@ UDPReceiver::UDPReceiver(QWidget *parent)
 {
     udpmessagehandler = new UDPMessageHandler();
     any_comm_recived = false;
+    debug_mode = false;
     lastcomm_timer.restart();
 }
 void UDPReceiver::Start()
 {
-
-    groupAddress = QHostAddress("239.255.43.21");
+    qDebug() << "Starting UDP Receiver with: " << server << ":" << port;
+    groupAddress = QHostAddress(server);
     udpSocket = new QUdpSocket(this);
 
-    udpSocket->bind(QHostAddress::AnyIPv4, 45454, QUdpSocket::ShareAddress);
+    udpSocket->bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress);
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     foreach (QNetworkInterface iface, list)
     {
          udpSocket->joinMulticastGroup(groupAddress,iface);
     }
-
-
     connect(udpSocket, SIGNAL(readyRead()),
             this, SLOT(processPendingDatagrams()));
-    qDebug() << "Open: " << udpSocket->isOpen() << " Valid: " << udpSocket->isValid();
 }
 
 void UDPReceiver::processPendingDatagrams()
@@ -88,7 +86,10 @@ void UDPReceiver::processPendingDatagrams()
         udpSocket->readDatagram(datagram.data(), datagram.size());
         QList<QByteArray> items = datagram.split(',');
         int message_id = items.at(0).toInt();
-
+        if(debug_mode)
+        {
+            qDebug() << "Received: " << message_id;
+        }
         switch(message_id)
         {
 
@@ -100,7 +101,10 @@ void UDPReceiver::processPendingDatagrams()
                 {
                     any_comm_recived = true;
                     lastcomm_timer.restart();
-                    emit new_armedstatusmessage(state);
+                    ArmedState newstate;
+                    newstate.state = state;
+                    emit new_armedstatusmessage(newstate);
+
                 }
                 break;
             }
